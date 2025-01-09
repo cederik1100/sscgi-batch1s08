@@ -128,47 +128,81 @@ class Trainer {
 
 
 // tournament
-class Tournament{
-    constructor(trainer1, trainer2) {
-        this.trainer1 = trainer1;
-        this.trainer2 = trainer2;
+class Tournament {
+    constructor(...trainers) {
+        this.trainers = trainers;  // Store all the trainers
     }
-
+ 
     startTournament() {
-        console.log(`               %cBattle begins between ${this.trainer1.name} and ${this.trainer2.name}!`, "color:rgb(253, 253, 253); font-size: 15px; font-weight: bold; border: 1px dashed white; padding: 8px;");
+        console.log(`%cTournament begins with ${this.trainers.length} trainers!`, "color:rgb(253, 253, 253); font-size: 15px; font-weight: bold; border: 1px dashed white; padding: 8px;");
+       
+        // Start first round
+        let round = 1;
+        let currentTrainers = [...this.trainers];
+ 
+        // Continue until only one trainer remains (the winner)
+        while (currentTrainers.length > 1) {
+            console.log(`\n%cRound ${round}:`, "color:rgb(253, 253, 253); font-size: 15px; font-weight: bold; padding: 8px;");
+            let winners = [];
+ 
+            // Pair up trainers for the round
+            for (let i = 0; i < currentTrainers.length; i += 2) {
+                let trainer1 = currentTrainers[i];
+                let trainer2 = currentTrainers[i + 1];
+ 
+                console.log(`           %cMatch: ${trainer1.name} vs ${trainer2.name}`, "color:rgb(253, 253, 253); font-size: 15px; font-weight: bold; border: 1px dashed white; padding: 8px;");
+ 
+                // Start battle between trainer1 and trainer2
+                let winner = this.startBattle(trainer1, trainer2);
+                winners.push(winner);
+                console.log(`%cWinner of this match: ${winner.name}`, "color:rgb(253, 253, 253); font-size: 13px; font-weight: bold; border: 1px dashed rgb(255, 0, 0); padding: 8px;");
+            }
+ 
+            // Update the trainers for the next round
+            currentTrainers = winners;
+            round++;
+        }
+ 
+        // Final winner
+        console.log(`%c🎉🎊 The tournament winner is ${currentTrainers[0].name}!`, "color:rgb(253, 253, 253); font-size: 15px; font-weight: bold; border: 1px double rgb(238, 255, 0); padding: 8px;");
+    }
+ 
+    startBattle(trainer1, trainer2) {
+        console.log(`%cBattle begins between ${trainer1.name} and ${trainer2.name}!`, "color:rgb(253, 253, 253); font-size: 15px; font-weight: bold; border: 1px dashed white; padding: 8px;");
         let t1Index = 0;
         let t2Index = 0;
-
-        while (t1Index < this.trainer1.pokemons.length && t2Index < this.trainer2.pokemons.length) {
-            let t1Pokemon = this.trainer1.pokemons[t1Index];
-            let t2Pokemon = this.trainer2.pokemons[t2Index];
-
-            console.log(`%c⭐ Round starts with ${t1Pokemon.name} vs ${t2Pokemon.name}!`, "color:rgb(253, 253, 253); font-size: 13px; font-weight: bold; border: 1px solid rgb(238, 255, 0); padding: 8px; b");
-
+ 
+        // Battle until one trainer's Pokémon are all defeated
+        while (t1Index < trainer1.pokemons.length && t2Index < trainer2.pokemons.length) {
+            let t1Pokemon = trainer1.pokemons[t1Index];
+            let t2Pokemon = trainer2.pokemons[t2Index];
+ 
+            console.log(`%c⭐ Round starts with ${t1Pokemon.name} vs ${t2Pokemon.name}!`, "color:rgb(253, 253, 253); font-size: 13px; font-weight: bold; border: 1px solid rgb(238, 255, 0); padding: 8px;");
+ 
+            // Pokémon battle
             while (t1Pokemon.hp > 0 && t2Pokemon.hp > 0) {
-                Math.random() < 0.5 ? t1Pokemon.attack(t2Pokemon) : t1Pokemon.specialAttack(t2Pokemon);	
+                Math.random() < 0.5 ? t1Pokemon.attack(t2Pokemon) : t1Pokemon.specialAttack(t2Pokemon);
                 if (t2Pokemon.hp > 0) {
                     t2Pokemon.attack(t1Pokemon);
                 }
             }
-
+ 
+            // Check if any Pokémon fainted and switch to the next Pokémon
             if (t1Pokemon.hp <= 0) {
-                t1Index++; 
+                t1Index++;
             }
-
+ 
             if (t2Pokemon.hp <= 0) {
                 t2Index++;
             }
         }
-
-        const winner = (t1Index < this.trainer1.pokemons.length) 
-            ? this.trainer1.pokemons[t1Index] 
-            : this.trainer2.pokemons[t2Index];
-        const trainerWinner = (t1Index < this.trainer1.pokemons.length) 
-            ? this.trainer1 
-            : this.trainer2;
-
-        console.log(`%c🎉🎊 ${trainerWinner.name} and ${winner.name} wins the Tournament battle!`, "color:rgb(253, 253, 253); font-size: 13px; font-weight: bold; border: 1px double rgb(238, 255, 0); padding: 8px;");
+ 
+        // Determine the winner of the battle
+        if (t1Index < trainer1.pokemons.length) {
+            return trainer1;
+        } else {
+            return trainer2;
+        }
     }
 }
 
